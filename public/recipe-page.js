@@ -24,7 +24,10 @@ function focusKey(el) {
   if (!el || !app.contains(el)) return null;
   if (el.classList.contains("clear-checks")) return ".clear-checks";
   const key = FOCUS_KEYS.find((k) => el.dataset[k] != null);
-  return key ? `[data-${key}="${el.dataset[key]}"]` : null;
+  // Scoped to controls: the wrapping <article> also carries data-tab.
+  if (!key) return null;
+  const value = el.dataset[key];
+  return `button[data-${key}="${value}"], input[data-${key}="${value}"]`;
 }
 
 function render() {
@@ -55,7 +58,12 @@ app.addEventListener("click", (event) => {
   } else if (target.dataset.tab) dispatch({ type: "tab", tab: target.dataset.tab });
   else if (target.dataset.step != null) dispatch({ type: "toggle-step", index: Number(target.dataset.step) });
   else if (target.dataset.servings) {
+    const hadFocus = document.activeElement === target;
     dispatch({ type: Number(target.dataset.servings) < 0 ? "servings-down" : "servings-up" });
+    // At 1 serving − comes back disabled and can't hold focus; move to +.
+    if (hadFocus && document.activeElement === document.body) {
+      app.querySelector('button[data-servings="1"]')?.focus();
+    }
   }
 });
 
@@ -73,6 +81,7 @@ async function load() {
     ({ recipe } = await res.json());
   } catch {
     recipe = null;
+    document.title = "Couldn't load recipe";
     app.innerHTML = renderRecipeError();
     app.querySelector(".retry")?.focus();
     return;
