@@ -21,6 +21,9 @@
   --text-body: 400 15px / 1.45 var(--font);
   --text-meta: 500 0.82rem / 1.4 var(--font);
   --text-chip: 600 0.72rem / 1.4 var(--font);
+  /* cooking sizes: read at arm's length */
+  --text-ing: 500 17px / 1.4 var(--font);
+  --text-step: 400 18px / 1.6 var(--font);
 
   /* space */
   --s1: 4px;
@@ -37,6 +40,7 @@
   --r-menu: 12px;
   --r-pill: 999px;
   --tap: 42px;
+  --tap-cook: 52px;
 
   /* elevation and motion */
   --shadow-hover: 0 8px 24px rgba(20, 30, 40, 0.08);
@@ -544,4 +548,346 @@ h2 {
 [data-view="empty"] .add-header,
 [data-view="empty"] .toolbar {
   display: none;
+}
+
+/* recipe page: photo hero, title block, Ingredients | Steps.
+   Phones: 4:3 hero, sticky tabs, one panel at a time.
+   720px+: 380px banner, sticky ingredients beside the steps, no tabs. */
+
+.hero {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  max-height: 62vh;
+  margin: 0 calc(-1 * var(--gutter));
+  overflow: hidden;
+  background: var(--line);
+}
+
+.hero img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-actions,
+.recipe-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+
+.hero-actions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: var(--s3) var(--gutter);
+}
+
+.hero-actions .btn {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: transparent;
+}
+
+.recipe-bar {
+  padding: var(--s3) 0;
+}
+
+.recipe-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  padding: var(--s5) 0 var(--s2);
+}
+
+.recipe-head h1 {
+  font-size: clamp(2rem, 7vw, 2.8rem);
+}
+
+.recipe-head p,
+.recipe-head .chips {
+  margin: 0;
+}
+
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s1);
+  padding: var(--s2) 0;
+  background: var(--bg);
+}
+
+.tab {
+  min-height: var(--tap-cook);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: 700 15px / 1.1 var(--font);
+  cursor: pointer;
+}
+
+.tab[aria-selected="true"] {
+  background: var(--accent-soft);
+  border-color: #F4C9C4;
+}
+
+.tab-progress {
+  color: var(--muted);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.recipe-body {
+  display: grid;
+  gap: var(--s7);
+  margin: var(--s3) 0 96px;
+}
+
+.recipe[data-tab="ingredients"] .steps,
+.recipe[data-tab="steps"] .ingredients {
+  display: none;
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  margin-bottom: var(--s3);
+}
+
+.ingredients h2,
+.steps h2 {
+  font-size: 1.4rem;
+}
+
+.steps h2 {
+  margin-bottom: var(--s3);
+}
+
+/* servings stepper */
+
+.servings {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+}
+
+.stepper {
+  width: var(--tap);
+  padding: 0;
+  border-color: transparent;
+  font: 700 20px / 1 var(--font);
+}
+
+.stepper:hover {
+  background: var(--accent-soft);
+}
+
+.stepper:disabled {
+  color: var(--muted);
+  cursor: default;
+  background: transparent;
+}
+
+.servings-count {
+  min-width: 88px;
+  text-align: center;
+  font: 700 15px / 1 var(--font);
+}
+
+/* ingredients: tick off as you gather */
+
+.ingredient-list,
+.step-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ingredient-row {
+  border-bottom: 1px solid var(--line);
+  font: var(--text-ing);
+}
+
+.ingredient-row label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  min-height: var(--tap-cook);
+  padding: var(--s3) var(--s2);
+  cursor: pointer;
+}
+
+.ingredient-row input {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin: -1px 0 0;
+  accent-color: var(--ink);
+}
+
+.ingredient-row.gathered span {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.gathered-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin-top: var(--s3);
+}
+
+.go-steps {
+  width: 100%;
+  margin-top: var(--s4);
+}
+
+/* steps: tap done; the next one is "Now" */
+
+.step {
+  margin-bottom: var(--s2);
+}
+
+.step-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--s4);
+  width: 100%;
+  min-height: var(--tap-cook);
+  padding: var(--s4) var(--s3);
+  border: 1px solid transparent;
+  border-radius: var(--r-card);
+  background: transparent;
+  color: var(--ink);
+  font: var(--text-step);
+  text-align: left;
+  cursor: pointer;
+}
+
+.step-num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  font: 800 15px / 1 var(--font);
+}
+
+.step-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.step.done .step-toggle {
+  color: var(--muted);
+}
+
+.step.done .step-num {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #FFFFFF;
+}
+
+.step.now .step-toggle {
+  background: var(--accent-soft);
+  border-color: #F4C9C4;
+}
+
+.step.now .step-num {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.now-mark {
+  order: -1;
+  flex-basis: 100%;
+  color: var(--accent);
+  font: 800 11.5px / 1 var(--font);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* "Add ingredients" / "Add steps" when a section is empty */
+
+.add-prompt {
+  display: flex;
+  justify-content: center;
+  padding: var(--s6);
+  border: 1.5px dashed #D5D5DA;
+  border-radius: var(--r-card);
+}
+
+/* loading skeleton in the page's shape */
+
+.recipe.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+.recipe.skeleton .hero {
+  margin-bottom: var(--s3);
+}
+
+.recipe.skeleton .skeleton-line:nth-of-type(1) {
+  height: 28px;
+}
+
+.recipe.skeleton .skeleton-line:nth-of-type(n + 3) {
+  height: 22px;
+}
+
+@media (min-width: 720px) {
+  .hero {
+    aspect-ratio: auto;
+    height: 380px;
+    max-height: none;
+    margin: 0;
+    border-radius: 0 0 var(--r-card) var(--r-card);
+  }
+  .hero-actions {
+    padding: var(--s4) var(--s5);
+  }
+  .recipe-head {
+    padding-top: var(--s6);
+  }
+  .tabs,
+  .go-steps {
+    display: none;
+  }
+  .recipe-body {
+    grid-template-columns: minmax(300px, 380px) 1fr;
+    gap: 48px;
+    align-items: start;
+    margin-top: var(--s6);
+  }
+  .recipe[data-tab] .ingredients,
+  .recipe[data-tab] .steps {
+    display: block;
+  }
+  .ingredients {
+    position: sticky;
+    top: var(--s4);
+  }
 }

@@ -11,7 +11,28 @@
       "totalMinutes": 25,
       "tags": ["Vegetarian", "Weeknight"],
       "addedBy": "Maya",
-      "addedAt": "2026-10-18T18:30:00Z"
+      "addedAt": "2026-10-18T18:30:00Z",
+      "servings": 4,
+      "ingredients": [
+        { "amount": 2, "unit": "cans", "item": "black beans", "note": "drained and rinsed" },
+        { "amount": 1, "unit": null, "item": "red onion", "note": "finely diced" },
+        { "amount": 2, "unit": "cloves", "item": "garlic", "note": "minced" },
+        { "amount": 1, "unit": "tsp", "item": "ground cumin", "note": null },
+        { "amount": 0.5, "unit": "tsp", "item": "smoked paprika", "note": null },
+        { "amount": 8, "unit": null, "item": "corn tortillas", "note": null },
+        { "amount": 1, "unit": null, "item": "avocado", "note": "sliced" },
+        { "amount": 0.5, "unit": "cup", "item": "crumbled feta", "note": null },
+        { "amount": 1, "unit": null, "item": "lime", "note": "cut into wedges" },
+        { "text": "a handful of fresh coriander" },
+        { "text": "salt to taste" }
+      ],
+      "steps": [
+        "Warm a splash of oil in a pan over medium heat and soften the onion for 5 minutes.",
+        "Add the garlic, cumin and paprika and stir for 1 minute until fragrant.",
+        "Tip in the beans with a splash of water, then mash about half of them with a fork. Simmer for 5 minutes and season with salt.",
+        "Warm the tortillas in a dry pan, about 30 seconds a side.",
+        "Fill each tortilla with beans, avocado, feta and coriander, and serve with lime wedges."
+      ]
     },
     {
       "id": "lemon-garlic-roast-chicken",
@@ -20,7 +41,24 @@
       "totalMinutes": 90,
       "tags": ["Sunday", "Family"],
       "addedBy": "Sam",
-      "addedAt": "2026-10-12T16:05:00Z"
+      "addedAt": "2026-10-12T16:05:00Z",
+      "servings": 6,
+      "ingredients": [
+        { "amount": 1, "unit": null, "item": "whole chicken", "note": "about 1.8 kg" },
+        { "amount": 2, "unit": null, "item": "lemons", "note": "halved" },
+        { "amount": 1, "unit": null, "item": "garlic bulb", "note": "halved across the middle" },
+        { "amount": 3, "unit": "tbsp", "item": "olive oil", "note": null },
+        { "amount": 1, "unit": "kg", "item": "small potatoes", "note": "halved" },
+        { "amount": 4, "unit": "sprigs", "item": "thyme", "note": null },
+        { "text": "salt and pepper to taste" }
+      ],
+      "steps": [
+        "Heat the oven to 200°C. Take the chicken out of the fridge 30 minutes before roasting.",
+        "Toss the potatoes with 2 tbsp of the oil and some salt in a large roasting tin.",
+        "Stuff the chicken with the lemon halves, garlic and thyme. Rub with the rest of the oil and season well.",
+        "Sit the chicken on the potatoes and roast for 1 hour 15 minutes, until the juices run clear.",
+        "Rest the chicken for 10 minutes before carving. Squeeze the roasted lemon over the potatoes."
+      ]
     },
     {
       "id": "miso-glazed-salmon",
@@ -29,7 +67,25 @@
       "totalMinutes": 30,
       "tags": ["Fish", "Weeknight"],
       "addedBy": "Jo",
-      "addedAt": "2026-10-15T19:12:00Z"
+      "addedAt": "2026-10-15T19:12:00Z",
+      "servings": 2,
+      "ingredients": [
+        { "amount": 2, "unit": null, "item": "salmon fillets", "note": "skin on" },
+        { "amount": 2, "unit": "tbsp", "item": "white miso", "note": null },
+        { "amount": 1, "unit": "tbsp", "item": "honey", "note": null },
+        { "amount": 1, "unit": "tbsp", "item": "soy sauce", "note": null },
+        { "amount": 1, "unit": "tsp", "item": "sesame oil", "note": null },
+        { "amount": 200, "unit": "g", "item": "greens", "note": "pak choi or tenderstem broccoli" },
+        { "amount": 1, "unit": "tbsp", "item": "sesame seeds", "note": "toasted" },
+        { "text": "steamed rice, to serve" }
+      ],
+      "steps": [
+        "Heat the grill to high and line a tray with foil.",
+        "Whisk the miso, honey and soy sauce together and spread over the salmon.",
+        "Grill the salmon for 8 to 10 minutes, until the glaze is caramelised and the fish flakes.",
+        "Meanwhile, stir-fry the greens in the sesame oil for 3 minutes.",
+        "Serve the salmon on rice with the greens and a scatter of sesame seeds."
+      ]
     },
     {
       "id": "tomato-basil-soup",
@@ -38,7 +94,24 @@
       "totalMinutes": 40,
       "tags": ["Vegetarian", "Soup"],
       "addedBy": "Alex",
-      "addedAt": "2026-10-20T12:45:00Z"
+      "addedAt": "2026-10-20T12:45:00Z",
+      "servings": 4,
+      "ingredients": [
+        { "amount": 2, "unit": "tbsp", "item": "olive oil", "note": null },
+        { "amount": 1, "unit": null, "item": "onion", "note": "chopped" },
+        { "amount": 3, "unit": "cloves", "item": "garlic", "note": "sliced" },
+        { "amount": 800, "unit": "g", "item": "chopped tomatoes", "note": "two tins" },
+        { "amount": 500, "unit": "ml", "item": "vegetable stock", "note": null },
+        { "amount": 0.25, "unit": "cup", "item": "cream", "note": "optional" },
+        { "text": "a large handful of basil leaves" },
+        { "text": "salt and pepper to taste" }
+      ],
+      "steps": [
+        "Warm the oil in a large pan and cook the onion gently for 8 minutes until soft.",
+        "Add the garlic and cook for 1 minute more.",
+        "Pour in the tomatoes and stock, bring to a simmer and cook for 20 minutes.",
+        "Add the basil and blend until smooth. Stir in the cream and season to taste."
+      ]
     },
     {
       "id": "overnight-oats",
@@ -47,7 +120,21 @@
       "totalMinutes": 5,
       "tags": ["Breakfast", "Make ahead"],
       "addedBy": "Maya",
-      "addedAt": "2026-09-30T07:20:00Z"
+      "addedAt": "2026-09-30T07:20:00Z",
+      "servings": 1,
+      "ingredients": [
+        { "amount": 0.5, "unit": "cup", "item": "rolled oats", "note": null },
+        { "amount": 0.5, "unit": "cup", "item": "milk", "note": null },
+        { "amount": 0.25, "unit": "cup", "item": "Greek yoghurt", "note": null },
+        { "amount": 1, "unit": "tbsp", "item": "chia seeds", "note": null },
+        { "amount": 1, "unit": "tsp", "item": "maple syrup", "note": null },
+        { "text": "berries to top" }
+      ],
+      "steps": [
+        "Stir the oats, milk, yoghurt, chia seeds and maple syrup together in a jar.",
+        "Cover and refrigerate overnight.",
+        "In the morning, stir, loosen with a splash of milk if needed and top with berries."
+      ]
     },
     {
       "id": "chickpea-spinach-curry",
@@ -56,7 +143,25 @@
       "totalMinutes": 35,
       "tags": ["Vegan", "Weeknight"],
       "addedBy": "Sam",
-      "addedAt": "2026-10-05T18:00:00Z"
+      "addedAt": "2026-10-05T18:00:00Z",
+      "servings": 4,
+      "ingredients": [
+        { "amount": 1, "unit": "tbsp", "item": "vegetable oil", "note": null },
+        { "amount": 1, "unit": null, "item": "onion", "note": "finely chopped" },
+        { "amount": 3, "unit": "cloves", "item": "garlic", "note": "grated" },
+        { "amount": 1, "unit": "tbsp", "item": "fresh ginger", "note": "grated" },
+        { "amount": 2, "unit": "tbsp", "item": "curry paste", "note": null },
+        { "amount": 2, "unit": "cans", "item": "chickpeas", "note": "drained" },
+        { "amount": 400, "unit": "ml", "item": "coconut milk", "note": null },
+        { "amount": 200, "unit": "g", "item": "baby spinach", "note": null },
+        { "text": "salt to taste" }
+      ],
+      "steps": [
+        "Heat the oil in a deep pan and soften the onion for 6 minutes.",
+        "Add the garlic, ginger and curry paste and cook for 2 minutes, stirring.",
+        "Add the chickpeas and coconut milk, bring to a simmer and cook for 15 minutes.",
+        "Stir in the spinach until wilted, season with salt and serve with rice or naan."
+      ]
     },
     {
       "id": "banana-bread",
@@ -74,7 +179,16 @@
       "totalMinutes": 20,
       "tags": ["Vegetarian", "Quick"],
       "addedBy": "Alex",
-      "addedAt": "2026-10-09T17:40:00Z"
+      "addedAt": "2026-10-09T17:40:00Z",
+      "servings": 4,
+      "ingredients": [
+        { "amount": 400, "unit": "g", "item": "spaghetti", "note": null },
+        { "amount": 0.5, "unit": "cup", "item": "basil pesto", "note": null },
+        { "amount": 0.5, "unit": "cup", "item": "parmesan", "note": "finely grated" },
+        { "amount": 2, "unit": "tbsp", "item": "pine nuts", "note": "toasted" },
+        { "text": "black pepper to taste" }
+      ],
+      "steps": []
     }
   ]
 }

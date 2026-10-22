@@ -25,6 +25,14 @@ function send(res, status, type, body) {
   res.end(body);
 }
 
+function safeDecode(s) {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s;
+  }
+}
+
 function sendJson(res, status, value) {
   send(res, status, types[".json"], JSON.stringify(value));
 }
@@ -37,6 +45,18 @@ async function serveRecipes(res, dataFile) {
   } catch {
     sendJson(res, 500, { error: "Could not load recipes" });
   }
+}
+
+async function serveRecipe(res, dataFile, id) {
+  let data;
+  try {
+    data = JSON.parse(await readFile(dataFile, "utf8"));
+  } catch {
+    return sendJson(res, 500, { error: "Could not load recipes" });
+  }
+  const recipe = data.recipes?.find((r) => r.id === id);
+  if (!recipe) return sendJson(res, 404, { error: "Recipe not found" });
+  sendJson(res, 200, { household: { name: data.household?.name }, recipe });
 }
 
 async function serveStatic(res, pathname) {
@@ -66,6 +86,9 @@ export function createServer({ dataFile = defaultDataFile } = {}) {
       return send(res, 405, "text/plain; charset=utf-8", "Method not allowed");
     }
     if (pathname === "/api/recipes") return serveRecipes(res, dataFile);
+    const apiMatch = pathname.match(/^\/api\/recipes\/([^/]+)$/);
+    if (apiMatch) return serveRecipe(res, dataFile, safeDecode(apiMatch[1]));
+    if (/^\/recipes\/[^/]+$/.test(pathname)) return serveStatic(res, "/recipe.html");
     return serveStatic(res, pathname);
   });
 }
