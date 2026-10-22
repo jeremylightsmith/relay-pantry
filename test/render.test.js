@@ -1,6 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { renderCard, renderGrid, renderHeader } from "../public/render.js";
+import {
+  countLabel,
+  renderCard,
+  renderGrid,
+  renderHeader,
+  renderSortMenu,
+} from "../public/render.js";
 
 const tacos = {
   id: "black-bean-tacos",
@@ -52,4 +58,22 @@ test("renderGrid renders one card per recipe", () => {
   const html = renderGrid([tacos, { ...tacos, id: "other" }]);
   assert.match(html, /^<ul class="grid"/);
   assert.equal(count(html, /<li/g), 2);
+});
+
+test("renderSortMenu checks only the current option and names it on the pill", () => {
+  const html = renderSortMenu("az");
+  const options = html.match(/<button[^>]*role="menuitemradio"[\s\S]*?<\/button>/g) ?? [];
+  assert.equal(options.length, 3);
+  const checked = options.filter((o) => o.includes('aria-checked="true"'));
+  assert.equal(checked.length, 1);
+  assert.ok(checked[0].includes("A–Z"));
+  assert.equal(count(html, /class="check"/g), 1);
+  assert.ok(checked[0].includes('class="check"'));
+  assert.match(html, /class="btn sort-pill"[^>]*>\s*Sort: A–Z ▾\s*</);
+});
+
+test("countLabel gives the total, or shown of total while searching", () => {
+  assert.equal(countLabel(24, 24), "24 recipes");
+  assert.equal(countLabel(3, 24), "3 of 24");
+  assert.equal(countLabel(1, 1), "1 recipe");
 });

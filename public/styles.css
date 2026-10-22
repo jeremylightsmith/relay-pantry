@@ -193,8 +193,126 @@ h2 {
 }
 
 .filters-slot {
+  grid-area: slot;
   min-height: var(--tap);
+}
+
+/* search and sort: phone puts search full width and sort beside the slot;
+   720px+ puts the sort pill in the search row */
+
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "search search"
+    "slot sort";
+  gap: var(--s3);
   margin-bottom: var(--s4);
+}
+
+.search {
+  grid-area: search;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: var(--s4);
+  color: var(--muted);
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.search input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0 var(--s4) 0 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: var(--text-body);
+}
+
+.search input::placeholder {
+  color: var(--muted);
+}
+
+.search input:focus-visible {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+.sort {
+  grid-area: sort;
+  position: relative;
+  justify-self: end;
+}
+
+.sort-pill {
+  white-space: nowrap;
+}
+
+.sort-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--s2));
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  padding: var(--s2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-menu);
+  background: var(--surface);
+  box-shadow: var(--shadow-menu);
+}
+
+.sort-menu[hidden] {
+  display: none;
+}
+
+.sort-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  min-height: var(--tap);
+  padding: var(--s2) var(--s3);
+  border: 0;
+  border-radius: var(--r-card);
+  background: transparent;
+  color: var(--ink);
+  font: var(--text-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.sort-option:hover {
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.sort-option[aria-checked="true"] {
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+
+.sort-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sort-label {
+  font-weight: 700;
+}
+
+.check {
+  color: var(--accent);
+  font-weight: 800;
 }
 
 .grid {
@@ -308,6 +426,11 @@ h2 {
 }
 
 @media (min-width: 720px) {
+  .toolbar {
+    grid-template-areas:
+      "search sort"
+      "slot slot";
+  }
   .add-header {
     display: inline-flex;
   }

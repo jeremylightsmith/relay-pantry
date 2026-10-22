@@ -1,7 +1,7 @@
 // String renderers for the recipe list. Every piece of data is HTML-escaped
 // before it reaches the markup, so these are safe to assign to innerHTML.
 
-import { formatTime } from "./recipes.js";
+import { SORT_OPTIONS, formatTime } from "./recipes.js";
 
 const ENTITIES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 
@@ -58,4 +58,26 @@ export function renderCard(recipe) {
 export function renderGrid(recipes) {
   const items = recipes.map((r) => `<li>${renderCard(r)}</li>`).join("\n");
   return `<ul class="grid" role="list">\n${items}\n</ul>`;
+}
+
+export function countLabel(shown, total) {
+  if (shown === total) return `${total} ${total === 1 ? "recipe" : "recipes"}`;
+  return `${shown} of ${total}`;
+}
+
+export function renderSortMenu(current) {
+  const selected = SORT_OPTIONS.find((o) => o.value === current) ?? SORT_OPTIONS[0];
+  const items = SORT_OPTIONS.map((option) => {
+    const on = option.value === selected.value;
+    return `<button type="button" class="sort-option" role="menuitemradio" aria-checked="${on}" data-sort="${escapeHtml(option.value)}" tabindex="-1">
+      <span class="sort-text"><span class="sort-label">${escapeHtml(option.label)}</span><span class="meta-text">${escapeHtml(option.hint)}</span></span>
+      ${on ? `<span class="check" aria-hidden="true">✓</span>` : ""}
+    </button>`;
+  }).join("\n    ");
+  return `<div class="sort">
+  <button type="button" class="btn sort-pill" aria-haspopup="menu" aria-expanded="false" aria-controls="sort-menu">Sort: ${escapeHtml(selected.label)} ▾</button>
+  <div class="sort-menu" id="sort-menu" role="menu" aria-label="Sort recipes" hidden>
+    ${items}
+  </div>
+</div>`;
 }
