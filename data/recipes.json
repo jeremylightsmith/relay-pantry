@@ -1,0 +1,80 @@
+{
+  "household": {
+    "name": "Pine Street Kitchen",
+    "members": ["Maya", "Sam", "Jo", "Alex"]
+  },
+  "recipes": [
+    {
+      "id": "black-bean-tacos",
+      "title": "Black bean tacos",
+      "photoUrl": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800",
+      "totalMinutes": 25,
+      "tags": ["Vegetarian", "Weeknight"],
+      "addedBy": "Maya",
+      "addedAt": "2026-10-18T18:30:00Z"
+    },
+    {
+      "id": "lemon-garlic-roast-chicken",
+      "title": "Lemon garlic roast chicken",
+      "photoUrl": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=800",
+      "totalMinutes": 90,
+      "tags": ["Sunday", "Family"],
+      "addedBy": "Sam",
+      "addedAt": "2026-10-12T16:05:00Z"
+    },
+    {
+      "id": "miso-glazed-salmon",
+      "title": "Miso glazed salmon with sesame greens",
+      "photoUrl": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800",
+      "totalMinutes": 30,
+      "tags": ["Fish", "Weeknight"],
+      "addedBy": "Jo",
+      "addedAt": "2026-10-15T19:12:00Z"
+    },
+    {
+      "id": "tomato-basil-soup",
+      "title": "Tomato basil soup",
+      "photoUrl": null,
+      "totalMinutes": 40,
+      "tags": ["Vegetarian", "Soup"],
+      "addedBy": "Alex",
+      "addedAt": "2026-10-20T12:45:00Z"
+    },
+    {
+      "id": "overnight-oats",
+      "title": "Overnight oats",
+      "photoUrl": "https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=800",
+      "totalMinutes": 5,
+      "tags": ["Breakfast", "Make ahead"],
+      "addedBy": "Maya",
+      "addedAt": "2026-09-30T07:20:00Z"
+    },
+    {
+      "id": "chickpea-spinach-curry",
+      "title": "Chickpea and spinach curry",
+      "photoUrl": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800",
+      "totalMinutes": 35,
+      "tags": ["Vegan", "Weeknight"],
+      "addedBy": "Sam",
+      "addedAt": "2026-10-05T18:00:00Z"
+    },
+    {
+      "id": "banana-bread",
+      "title": "Banana bread",
+      "photoUrl": null,
+      "totalMinutes": 75,
+      "tags": ["Baking"],
+      "addedBy": "Jo",
+      "addedAt": "2026-09-22T14:10:00Z"
+    },
+    {
+      "id": "pesto-pasta",
+      "title": "Pesto pasta",
+      "photoUrl": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800",
+      "totalMinutes": 20,
+      "tags": ["Vegetarian", "Quick"],
+      "addedBy": "Alex",
+      "addedAt": "2026-10-09T17:40:00Z"
+    }
+  ]
+}

@@ -1,0 +1,547 @@
+/* Pantry style guide: Tomato & Charcoal. See docs/style-guide.md. */
+
+:root {
+  /* colour */
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --ink: #1F1F23;
+  --muted: #62626B;
+  --line: #E7E7EA;
+  --accent: #D7372B;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #FCE9E7;
+  --focus: #D7372B;
+  --danger: #B3261E;
+
+  /* type: Manrope throughout */
+  --font: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --text-display: 800 clamp(1.9rem, 6vw, 2.6rem) / 1.05 var(--font);
+  --text-section: 800 1.6rem / 1.15 var(--font);
+  --text-card: 800 1rem / 1.2 var(--font);
+  --text-body: 400 15px / 1.45 var(--font);
+  --text-meta: 500 0.82rem / 1.4 var(--font);
+  --text-chip: 600 0.72rem / 1.4 var(--font);
+
+  /* space */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s7: 32px;
+  --gutter: 16px;
+
+  /* shape */
+  --r-card: 10px;
+  --r-menu: 12px;
+  --r-pill: 999px;
+  --tap: 42px;
+
+  /* elevation and motion */
+  --shadow-hover: 0 8px 24px rgba(20, 30, 40, 0.08);
+  --shadow-menu: 0 12px 32px rgba(20, 20, 30, 0.14);
+  --shadow-fab: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --ease: 150ms ease;
+
+  --max-width: 1180px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: var(--text-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1 {
+  font: var(--text-display);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+h2 {
+  font: var(--text-section);
+  margin: 0;
+}
+
+.meta-text {
+  color: var(--muted);
+  font: var(--text-meta);
+}
+
+/* layout */
+
+.wrap {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s3);
+}
+
+/* buttons: one primary per screen, everything else secondary */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  min-height: var(--tap);
+  padding: 0 var(--s4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: 600 15px / 1 var(--font);
+  cursor: pointer;
+  transition: background-color var(--ease), border-color var(--ease);
+}
+
+.btn.primary {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-ink);
+}
+
+/* chip: tags use the soft tint, never solid red */
+
+.chip {
+  display: inline-block;
+  padding: 3px var(--s2);
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--ink);
+  font: var(--text-chip);
+}
+
+/* focus ring */
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (min-width: 720px) {
+  :root {
+    --gutter: 28px;
+  }
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s5);
+  }
+}
+
+@media (min-width: 1080px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* page header: household name, members, Add recipe (desktop) */
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding: var(--s6) 0 var(--s5);
+}
+
+.page-header p {
+  margin: var(--s1) 0 0;
+}
+
+.add-header {
+  display: none;
+}
+
+/* list heading and the reserved filters/favourites slot (PA5, PA24) */
+
+.list-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  margin-bottom: var(--s3);
+}
+
+.filters-slot {
+  grid-area: slot;
+  min-height: var(--tap);
+}
+
+/* search and sort: phone puts search full width and sort beside the slot;
+   720px+ puts the sort pill in the search row */
+
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "search search"
+    "slot sort";
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+}
+
+.search {
+  grid-area: search;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: var(--s4);
+  color: var(--muted);
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.search input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0 var(--s4) 0 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: var(--text-body);
+}
+
+.search input::placeholder {
+  color: var(--muted);
+}
+
+.search input:focus-visible {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+.sort {
+  grid-area: sort;
+  position: relative;
+  justify-self: end;
+}
+
+.sort-pill {
+  white-space: nowrap;
+}
+
+.sort-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--s2));
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  padding: var(--s2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-menu);
+  background: var(--surface);
+  box-shadow: var(--shadow-menu);
+}
+
+.sort-menu[hidden] {
+  display: none;
+}
+
+.sort-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  min-height: var(--tap);
+  padding: var(--s2) var(--s3);
+  border: 0;
+  border-radius: var(--r-card);
+  background: transparent;
+  color: var(--ink);
+  font: var(--text-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.sort-option:hover {
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.sort-option[aria-checked="true"] {
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+
+.sort-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sort-label {
+  font-weight: 700;
+}
+
+.check {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.grid {
+  list-style: none;
+  margin: 0 0 96px;
+  padding: 0;
+}
+
+/* recipe card: 4:3 photo, added-by initial, 2-line title, time, chips */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  transition: transform var(--ease), box-shadow var(--ease);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.photo {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--line);
+}
+
+.photo img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo.placeholder {
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  color: var(--muted);
+}
+
+.avatar {
+  position: absolute;
+  top: var(--s2);
+  right: var(--s2);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  color: #FFFFFF;
+  font: 800 0.75rem / 1 var(--font);
+}
+
+/* muted tones, never red */
+.avatar.tone-0 { background: #4A6B5D; }
+.avatar.tone-1 { background: #5B5F8A; }
+.avatar.tone-2 { background: #7A6248; }
+.avatar.tone-3 { background: #4F6E85; }
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  padding: var(--s3);
+}
+
+.card-title {
+  margin: 0;
+  font: var(--text-card);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-body p {
+  margin: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+  margin-top: var(--s1);
+}
+
+/* floating Add recipe button on phones */
+
+.fab {
+  position: fixed;
+  right: var(--s5);
+  bottom: var(--s5);
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: var(--shadow-fab);
+  font: 600 28px / 1 var(--font);
+}
+
+@media (min-width: 720px) {
+  .toolbar {
+    grid-template-areas:
+      "search sort"
+      "slot slot";
+  }
+  .add-header {
+    display: inline-flex;
+  }
+  .fab {
+    display: none;
+  }
+}
+
+/* view states: loading skeletons, error over skeletons, empty, no results */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skeleton .photo,
+.skeleton-line {
+  background: var(--line);
+}
+
+.skeleton-line {
+  display: block;
+  height: 12px;
+  border-radius: var(--r-pill);
+}
+
+.skeleton-line.short {
+  width: 45%;
+}
+
+.skeletons .card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s2);
+  max-width: 420px;
+  margin: var(--s7) auto 96px;
+  padding: var(--s6);
+  text-align: center;
+}
+
+.state h3 {
+  margin: var(--s2) 0 0;
+  font: var(--text-section);
+  font-size: 1.25rem;
+}
+
+.state p {
+  margin: 0;
+}
+
+.state .btn {
+  margin-top: var(--s3);
+}
+
+.state-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--muted);
+  font: 800 1.6rem / 1 var(--font);
+}
+
+.state.error .error-icon {
+  background: var(--danger);
+  color: #FFFFFF;
+}
+
+.state.error h3 {
+  color: var(--danger);
+}
+
+.state-overlay {
+  position: relative;
+}
+
+.state-overlay .state {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 1;
+  width: min(420px, 100%);
+  margin: var(--s7) 0 0;
+  transform: translateX(-50%);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-menu);
+}
+
+.state-overlay .skeletons {
+  opacity: 0.6;
+}
+
+/* empty state: the one primary action is in the state, so the header and
+   floating Add buttons and the search toolbar step aside */
+
+[data-view="empty"] .fab,
+[data-view="empty"] .add-header,
+[data-view="empty"] .toolbar {
+  display: none;
+}
