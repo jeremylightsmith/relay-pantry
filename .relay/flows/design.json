@@ -1,0 +1,41 @@
+{
+  "derived": {
+    "lands_on": "Design:Review",
+    "pulls_from": "Next up"
+  },
+  "edges": [
+    {
+      "from": "start",
+      "to": "mockups"
+    },
+    {
+      "from": "mockups",
+      "on": "succeeded",
+      "to": "done"
+    },
+    {
+      "from": "mockups",
+      "on": "failed",
+      "to": "needs_input"
+    }
+  ],
+  "enabled": true,
+  "isolation": "shared_clean",
+  "key": "design",
+  "nodes": [
+    {
+      "key": "mockups",
+      "llm": "Claude Opus",
+      "run": "Design card {ref}: make HTML mockups and upload them to the card. **Never write to the repo**: this worktree is shared.\n\nEach run is one round; a rejection sends the card back here with only the card as memory. Converge: get closer each round, and leave a trail.\n1. **Read.** The description is the ask. Read the rejection note first, then every comment. Pull the current mockups: `{relay} mockups {ref} --pull <scratch>/prev --json`.\n2. **Look at the real app**, if it runs: start it as `package.json` says, in the foreground under `timeout`, and only look. Build on what exists.\n3. **Round 1: ask, usually instead of mocking.** Put every question in one needs-input: who it's for, what matters most on screen, empty and error states, mobile, what's fixed and what's your call. Don't ask what you can find out.\n4. **Build** self-contained HTML: inline CSS, Google Fonts allowed, nothing else external. Reuse the app's look.\n5. **Check** screenshots at desktop and phone width, and fix what's broken.\n6. **Upload**: `{relay} mockups {ref} <a.html> <b.html> --caption \"<decision A>\" --caption \"<decision B>\"` (this replaces the list). Comment the round: what was asked, what changed, what you tried and dropped. Keep a short `## Design` list of decisions at the end of the description (`{relay} describe {ref} @<file>`), rewritten each round, never touching the text above it.\n7. **Finish.** Several options \u2192 ask which wins. One direction \u2192 succeed; a human reviews it.\n\nRules: a rejection asking for a specific change \u2192 change only that. Options differ by a real decision, named in the caption. Rejected twice for the same reason \u2192 ask. Never succeed without a mockup.\n\n---\nAbout Relay: you are one step of a Relay flow, working card {ref} unattended. `{relay}` is the Relay CLI; relay.md explains it.\n- The card is the source of truth: `{relay} card {ref}`. A rejection note comes first; comments hold earlier rounds and human answers.\n- Scratch files go in `$(dirname \"$RELAY_NODE_SCRATCH\")`, never in the repo.\n- Touch only this card. Don't move it or check off tasks.\n- Need a human decision? Write `[{\"prompt\": \"...\", \"options\": [\"...\"], \"allow_text\": true}]` to a scratch file, run `{relay} needs-input {ref} --questions @<file>`, and stop without an outcome. The answer comes back as a comment.",
+      "type": "agent",
+      "writes": [
+        "mockups"
+      ]
+    }
+  ],
+  "problem": null,
+  "trigger": {
+    "stage": "Design"
+  },
+  "version": 2
+}

@@ -1,0 +1,47 @@
+{
+  "derived": {
+    "lands_on": "Plan:Review",
+    "pulls_from": "Design:Done"
+  },
+  "edges": [
+    {
+      "from": "start",
+      "to": "write_plan"
+    },
+    {
+      "from": "write_plan",
+      "on": "succeeded",
+      "to": "done"
+    },
+    {
+      "from": "write_plan",
+      "on": "failed",
+      "to": "needs_input"
+    }
+  ],
+  "enabled": true,
+  "isolation": "shared_clean",
+  "key": "plan",
+  "nodes": [
+    {
+      "key": "write_plan",
+      "llm": "Claude Opus",
+      "max_retries": 1,
+      "reads": [
+        "spec",
+        "acceptance_criteria"
+      ],
+      "run": "Plan card {ref}: write a plan header and tasks to the card for the Code flow. Don't touch git.\n\nRead the `spec` and `acceptance_criteria`, and enough of the repo to name real files. No spec? Ask; don't invent one. A rejection on an existing plan? Plan only the fix.\n\nWrite decisions, not code; the implementer writes the code and tests.\n- **Header**: Goal, Architecture, Constraints, and `## Verification` with `Gate: npm test`.\n- **Tasks**: about 3 vertical slices, each testable on its own. The implementer sees only its own task, so each body stands alone:\n  - **Files** to create or change, tests included\n  - **Interfaces** shared with other tasks: exact names and types\n  - **Decisions** the spec settled: exact copy and values\n  - **Behaviours**: one line per test, situation \u2192 expected result\n  - **Deliverable**, with a commit message\n- Every acceptance criterion is covered by some task.\n\nTo write it: remove old tasks (`{relay} tasks list {ref} --json`, then `{relay} task rm {ref} <id>`; on a re-plan keep the done ones), run `{relay} plan {ref} @<header>`, then add all tasks in one call, `{relay} tasks add {ref} --task \"<title>\" @<file> --task ...`. Check with `{relay} tasks list {ref}`.\n\n---\nAbout Relay: you are one step of a Relay flow, working card {ref} unattended. `{relay}` is the Relay CLI; relay.md explains it.\n- The card is the source of truth: `{relay} card {ref}`. A rejection note comes first; comments hold earlier rounds and human answers.\n- Scratch files go in `$(dirname \"$RELAY_NODE_SCRATCH\")`, never in the repo.\n- Touch only this card. Don't move it or check off tasks.\n- Need a human decision? Write `[{\"prompt\": \"...\", \"options\": [\"...\"], \"allow_text\": true}]` to a scratch file, run `{relay} needs-input {ref} --questions @<file>`, and stop without an outcome. The answer comes back as a comment.",
+      "type": "agent",
+      "writes": [
+        "plan",
+        "tasks"
+      ]
+    }
+  ],
+  "problem": null,
+  "trigger": {
+    "stage": "Plan"
+  },
+  "version": 2
+}

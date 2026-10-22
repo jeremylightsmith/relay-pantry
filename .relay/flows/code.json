@@ -1,0 +1,263 @@
+{
+  "derived": {
+    "lands_on": "Review",
+    "pulls_from": "Plan:Done"
+  },
+  "edges": [
+    {
+      "from": "start",
+      "to": "branch"
+    },
+    {
+      "from": "branch",
+      "on": "succeeded",
+      "to": "implement"
+    },
+    {
+      "from": "implement",
+      "on": "succeeded",
+      "to": "review"
+    },
+    {
+      "from": "review",
+      "max_loops": 3,
+      "on": "failed",
+      "to": "fix"
+    },
+    {
+      "from": "review",
+      "on": "succeeded",
+      "to": "implement",
+      "when": "foreach_remaining"
+    },
+    {
+      "from": "review",
+      "on": "succeeded",
+      "to": "final_review",
+      "when": "foreach_exhausted"
+    },
+    {
+      "from": "fix",
+      "on": "succeeded",
+      "to": "review"
+    },
+    {
+      "from": "final_review",
+      "on": "succeeded",
+      "to": "acceptance"
+    },
+    {
+      "from": "final_review",
+      "max_loops": 3,
+      "on": "partial",
+      "to": "implement"
+    },
+    {
+      "from": "acceptance",
+      "on": "succeeded",
+      "to": "sync"
+    },
+    {
+      "from": "acceptance",
+      "max_loops": 3,
+      "on": "partial",
+      "to": "implement"
+    },
+    {
+      "from": "sync",
+      "on": "succeeded",
+      "to": "check"
+    },
+    {
+      "from": "sync",
+      "on": "failed",
+      "to": "sync_fix"
+    },
+    {
+      "from": "sync_fix",
+      "on": "succeeded",
+      "to": "check"
+    },
+    {
+      "from": "check",
+      "on": "succeeded",
+      "to": "merge"
+    },
+    {
+      "from": "check",
+      "max_loops": 3,
+      "on": "failed",
+      "to": "new_task"
+    },
+    {
+      "from": "new_task",
+      "max_loops": 3,
+      "on": "succeeded",
+      "to": "implement"
+    },
+    {
+      "from": "merge",
+      "on": "succeeded",
+      "to": "post_results"
+    },
+    {
+      "from": "merge",
+      "max_loops": 2,
+      "on": "failed",
+      "to": "sync"
+    },
+    {
+      "from": "post_results",
+      "on": "succeeded",
+      "to": "done"
+    },
+    {
+      "from": "branch",
+      "on": "failed",
+      "to": "needs_input"
+    },
+    {
+      "from": "implement",
+      "on": "failed",
+      "to": "needs_input"
+    },
+    {
+      "from": "fix",
+      "on": "failed",
+      "to": "needs_input"
+    },
+    {
+      "from": "final_review",
+      "on": "failed",
+      "to": "needs_input"
+    },
+    {
+      "from": "acceptance",
+      "on": "failed",
+      "to": "needs_input"
+    },
+    {
+      "from": "sync_fix",
+      "on": "failed",
+      "to": "needs_input"
+    },
+    {
+      "from": "new_task",
+      "on": "failed",
+      "to": "needs_input"
+    },
+    {
+      "from": "post_results",
+      "on": "failed",
+      "to": "needs_input"
+    }
+  ],
+  "enabled": true,
+  "isolation": "exclusive",
+  "key": "code",
+  "nodes": [
+    {
+      "key": "branch",
+      "reads": [
+        "plan"
+      ],
+      "run": "{relay} git-fetch && open=$(gh pr list --head {branch} --state open --json number -q length) && if [ \"$open\" -gt 0 ]; then base=origin/{branch}; else base=origin/main; fi && git checkout -B {branch} \"$base\" && {relay} card {ref} --json | jq -r '.plan // empty' > \"$RELAY_PLAN\" && test -s \"$RELAY_PLAN\" && {relay} branch {ref} {branch}",
+      "type": "shell",
+      "writes": [
+        "branch"
+      ]
+    },
+    {
+      "effort": "high",
+      "expects_commits": true,
+      "foreach": "card.tasks",
+      "key": "implement",
+      "llm": "Claude Opus",
+      "max_retries": 1,
+      "reads": [
+        "tasks"
+      ],
+      "run": "Implement task {task_id} (\"{task}\"), and only this task.\n1. Read it: `{relay} task show {ref} {task_id}`. Read the plan header: `{relay} card {ref} --json --field plan`.\n2. Test first: for each Behaviours line, write a test, watch it fail, then make it pass.\n3. Build only what the task asks. Match its Interfaces names exactly.\n4. Run `npm test` and read the output.\n5. Commit, using the task's commit message.\n\nAlready built? Say so and run `{relay} outcome succeeded --no-changes`.\nReport what changed and the test output.\n\n---\nAbout Relay: you are one step of a Relay flow, working card {ref} unattended. `{relay}` is the Relay CLI; relay.md explains it.\n- The card is the source of truth: `{relay} card {ref}`. A rejection note comes first; comments hold earlier rounds and human answers.\n- Scratch files go in `$(dirname \"$RELAY_NODE_SCRATCH\")`, never in the repo.\n- Touch only this card. Don't move it or check off tasks.\n- Need a human decision? Write `[{\"prompt\": \"...\", \"options\": [\"...\"], \"allow_text\": true}]` to a scratch file, run `{relay} needs-input {ref} --questions @<file>`, and stop without an outcome. The answer comes back as a comment.",
+      "type": "agent"
+    },
+    {
+      "key": "review",
+      "llm": "Claude Opus",
+      "reads": [
+        "tasks"
+      ],
+      "role": "check",
+      "run": "Review task {task_id} (\"{task}\"), just committed, against its spec: `{relay} task show {ref} {task_id}`. Read-only: use `git show` and `git diff`.\n\nFail it only for Critical or Important problems:\n- something the task asked for is missing, wrong, or untested (each Behaviours line needs a real test)\n- something was built that it didn't ask for\n- bugs, hard-to-follow code, or code that ignores the repo's conventions\nNote minor polish, but pass.\n\nIf the message holds your earlier findings, only check those were fixed; a new finding blocks only if it is Critical.\nDecide first, then explain. Give each finding as `file:line`: problem \u2192 fix.\n\n---\nAbout Relay: you are one step of a Relay flow, working card {ref} unattended. `{relay}` is the Relay CLI; relay.md explains it.\n- The card is the source of truth: `{relay} card {ref}`. A rejection note comes first; comments hold earlier rounds and human answers.\n- Scratch files go in `$(dirname \"$RELAY_NODE_SCRATCH\")`, never in the repo.\n- Touch only this card. Don't move it or check off tasks.\n- Need a human decision? Write `[{\"prompt\": \"...\", \"options\": [\"...\"], \"allow_text\": true}]` to a scratch file, run `{relay} needs-input {ref} --questions @<file>`, and stop without an outcome. The answer comes back as a comment.",
+      "type": "agent"
+    },
+    {
+      "expects_commits": true,
+      "key": "fix",
+      "llm": "Claude Opus",
+      "max_retries": 1,
+      "reads": [
+        "tasks"
+      ],
+      "run": "A review rejected task {task_id} (\"{task}\"); the findings are in the message. Fix every one, staying inside this task (`{relay} task show {ref} {task_id}` if you need its spec). If a finding is wrong, say why.\nRun `npm test`, then commit. Report each finding: fixed at `file:line`, or why not.\n\n---\nAbout Relay: you are one step of a Relay flow, working card {ref} unattended. `{relay}` is the Relay CLI; relay.md explains it.\n- The card is the source of truth: `{relay} card {ref}`. A rejection note comes first; comments hold earlier rounds and human answers.\n- Scratch files go in `$(dirname \"$RELAY_NODE_SCRATCH\")`, never in the repo.\n- Touch only this card. Don't move it or check off tasks.\n- Need a human decision? Write `[{\"prompt\": \"...\", \"options\": [\"...\"], \"allow_text\": true}]` to a scratch file, run `{relay} needs-input {ref} --questions @<file>`, and stop without an outcome. The answer comes back as a comment.",
+      "type": "agent"
+    },
+    {
+      "key": "final_review",
+      "llm": "Claude Opus",
+      "role": "check",
+      "run": "Review card {ref}'s whole branch for problems the per-task reviews couldn't see. Read-only.\n- Spec: the plan header (`{relay} card {ref} --json --field plan`) and the tasks (`{relay} tasks list {ref}`).\n- Diff: `git diff --stat origin/main...HEAD`, then read it in slices by area.\n\nLook for planned work that's missing or untested, tasks that clash (names, patterns, two solutions to one problem), broken callers, security or data-loss risks, and dead or unrequested code.\nOnly Critical or Important problems block; mention minor ones and pass. If tasks were already added from your last review, check those and block only on a new Critical problem.\n\nTo send work back: add it as tasks in one call, `{relay} tasks add {ref} --task \"<title>\" @<file> [--task ...]`. Each body has **Files**, **Behaviours** (one line per test: situation \u2192 expected result), **Deliverable** (with a commit message) and your evidence. Then write why to `$RELAY_NODE_SCRATCH` and run `{relay} outcome partial --detail @\"$RELAY_NODE_SCRATCH\"`. (`partial` is valid even though the contract lists only succeeded/failed; it returns the branch to implement.)\n\n---\nAbout Relay: you are one step of a Relay flow, working card {ref} unattended. `{relay}` is the Relay CLI; relay.md explains it.\n- The card is the source of truth: `{relay} card {ref}`. A rejection note comes first; comments hold earlier rounds and human answers.\n- Scratch files go in `$(dirname \"$RELAY_NODE_SCRATCH\")`, never in the repo.\n- Touch only this card. Don't move it or check off tasks.\n- Need a human decision? Write `[{\"prompt\": \"...\", \"options\": [\"...\"], \"allow_text\": true}]` to a scratch file, run `{relay} needs-input {ref} --questions @<file>`, and stop without an outcome. The answer comes back as a comment.",
+      "type": "agent"
+    },
+    {
+      "key": "acceptance",
+      "llm": "Claude Sonnet",
+      "role": "check",
+      "run": "Check card {ref} against its acceptance criteria: `{relay} card {ref} --json --field acceptance_criteria`. None? Pass.\n\nFollow each criterion's steps literally and mark it **pass**, **fail** (say what happened instead) or **human-verify** (can't be checked here; say why). Never guess a pass.\nIf a step needs the app, start it as `package.json` says, in the foreground under `timeout`, and save screenshots to `tmp/acceptance/`. Don't edit code or commit.\nWrite the checklist, with screenshot paths, to `tmp/acceptance/report.md`; the results step posts it.\n\nAll pass or human-verify \u2192 succeeded. Any fail \u2192 send it back, quoting the criterion.\nTo send work back: add it as tasks in one call, `{relay} tasks add {ref} --task \"<title>\" @<file> [--task ...]`. Each body has **Files**, **Behaviours** (one line per test: situation \u2192 expected result), **Deliverable** (with a commit message) and your evidence. Then write why to `$RELAY_NODE_SCRATCH` and run `{relay} outcome partial --detail @\"$RELAY_NODE_SCRATCH\"`. (`partial` is valid even though the contract lists only succeeded/failed; it returns the branch to implement.)\n\n---\nAbout Relay: you are one step of a Relay flow, working card {ref} unattended. `{relay}` is the Relay CLI; relay.md explains it.\n- The card is the source of truth: `{relay} card {ref}`. A rejection note comes first; comments hold earlier rounds and human answers.\n- Scratch files go in `$(dirname \"$RELAY_NODE_SCRATCH\")`, never in the repo.\n- Touch only this card. Don't move it or check off tasks.\n- Need a human decision? Write `[{\"prompt\": \"...\", \"options\": [\"...\"], \"allow_text\": true}]` to a scratch file, run `{relay} needs-input {ref} --questions @<file>`, and stop without an outcome. The answer comes back as a comment.",
+      "type": "agent"
+    },
+    {
+      "key": "sync",
+      "run": "{relay} git-fetch && { git rebase origin/main || { git rebase --abort; exit 1; }; }",
+      "type": "shell"
+    },
+    {
+      "key": "sync_fix",
+      "llm": "Claude Sonnet",
+      "run": "Rebasing onto origin/main hit conflicts (origin/main is fetched; the rebase was aborted). Run `git rebase origin/main` and resolve each conflict, keeping what both sides intended.\nIf a resolution needs a human, run `git rebase --abort` and ask. Never commit a guess. Report how you resolved each file.\n\n---\nAbout Relay: you are one step of a Relay flow, working card {ref} unattended. `{relay}` is the Relay CLI; relay.md explains it.\n- The card is the source of truth: `{relay} card {ref}`. A rejection note comes first; comments hold earlier rounds and human answers.\n- Scratch files go in `$(dirname \"$RELAY_NODE_SCRATCH\")`, never in the repo.\n- Touch only this card. Don't move it or check off tasks.\n- Need a human decision? Write `[{\"prompt\": \"...\", \"options\": [\"...\"], \"allow_text\": true}]` to a scratch file, run `{relay} needs-input {ref} --questions @<file>`, and stop without an outcome. The answer comes back as a comment.",
+      "type": "agent"
+    },
+    {
+      "key": "check",
+      "run": "npm test",
+      "type": "gate"
+    },
+    {
+      "key": "new_task",
+      "llm": "Claude Sonnet",
+      "run": "`npm test` failed after rebasing card {ref} onto main; the output is in the message. Don't fix it; turn it into a task.\nFind the cause, then add one task: `{relay} tasks add {ref} --task \"Fix: <what>\" @<file>`, with **Files**, **Behaviours** (the failing tests by name), **Deliverable** (`npm test` green, and a commit message) and the key output lines. Then declare succeeded; the flow goes back to implement.\nIf the cause is the environment (Node missing, network down), add nothing: declare failed and say why.\n\n---\nAbout Relay: you are one step of a Relay flow, working card {ref} unattended. `{relay}` is the Relay CLI; relay.md explains it.\n- The card is the source of truth: `{relay} card {ref}`. A rejection note comes first; comments hold earlier rounds and human answers.\n- Scratch files go in `$(dirname \"$RELAY_NODE_SCRATCH\")`, never in the repo.\n- Touch only this card. Don't move it or check off tasks.\n- Need a human decision? Write `[{\"prompt\": \"...\", \"options\": [\"...\"], \"allow_text\": true}]` to a scratch file, run `{relay} needs-input {ref} --questions @<file>`, and stop without an outcome. The answer comes back as a comment.",
+      "type": "agent"
+    },
+    {
+      "key": "merge",
+      "run": "sha=$(git rev-parse HEAD); url=$(gh pr list --head {branch} --state merged --json url,headRefOid -q \"map(select(.headRefOid == \\\"$sha\\\"))[0].url // empty\"); if [ -n \"$url\" ]; then {relay} pr {ref} \"$url\"; exit 0; fi; if [ \"$(git rev-list --count origin/main..HEAD)\" = 0 ]; then echo 'nothing on {branch} beyond origin/main to ship'; exit 0; fi; git push --force-with-lease origin HEAD:refs/heads/{branch} && url=$(gh pr list --head {branch} --state open --json url -q '.[0].url // empty') && { [ -n \"$url\" ] || url=$(gh pr create --fill --head {branch} --base main); } && {relay} pr {ref} \"$url\" && gh pr merge \"$url\" --squash --auto",
+      "type": "shell",
+      "writes": [
+        "pr_url"
+      ]
+    },
+    {
+      "key": "post_results",
+      "llm": "Claude Sonnet",
+      "run": "Post card {ref}'s results.\n1. Upload each screenshot listed in `tmp/acceptance/report.md`: `{relay} attach {ref} <path> --field url`.\n2. Comment the checklist with those images: `{relay} comment {ref} @<file>`.\n3. Record `{relay} result {ref} @<file>` in the shape relay.md gives. Write for a product owner: `summary` is 3\u20135 bullets on what to go look at; `changes` are short verb phrases (\"Adds pantry search\"); `screens` come from the uploads.\n\n---\nAbout Relay: you are one step of a Relay flow, working card {ref} unattended. `{relay}` is the Relay CLI; relay.md explains it.\n- The card is the source of truth: `{relay} card {ref}`. A rejection note comes first; comments hold earlier rounds and human answers.\n- Scratch files go in `$(dirname \"$RELAY_NODE_SCRATCH\")`, never in the repo.\n- Touch only this card. Don't move it or check off tasks.\n- Need a human decision? Write `[{\"prompt\": \"...\", \"options\": [\"...\"], \"allow_text\": true}]` to a scratch file, run `{relay} needs-input {ref} --questions @<file>`, and stop without an outcome. The answer comes back as a comment.",
+      "type": "agent",
+      "writes": [
+        "ai_result"
+      ]
+    }
+  ],
+  "problem": null,
+  "trigger": {
+    "stage": "Code"
+  },
+  "version": 3
+}
