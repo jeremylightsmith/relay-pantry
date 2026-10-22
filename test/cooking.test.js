@@ -6,6 +6,7 @@ import {
   ingredientLine,
   nextStepIndex,
   gatheredLabel,
+  reduce,
 } from "../public/cooking.js";
 
 test("scaleAmount scales by the servings ratio", () => {
@@ -40,4 +41,42 @@ test("nextStepIndex is the first step not done, or -1 when all are", () => {
 
 test("gatheredLabel counts ticked ingredients", () => {
   assert.equal(gatheredLabel(2, 12), "2 of 12 gathered");
+});
+
+const view = (over = {}) => ({ servings: 4, gathered: new Set(), done: new Set(), tab: "ingredients", ...over });
+
+test("reduce: toggle-ingredient twice leaves it unticked", () => {
+  const once = reduce(view(), { type: "toggle-ingredient", index: 2 });
+  assert.deepEqual([...once.gathered], [2]);
+  const twice = reduce(once, { type: "toggle-ingredient", index: 2 });
+  assert.deepEqual([...twice.gathered], []);
+});
+
+test("reduce: clear-checks empties gathered and keeps done steps", () => {
+  const next = reduce(view({ gathered: new Set([0, 3]), done: new Set([1]) }), { type: "clear-checks" });
+  assert.deepEqual([...next.gathered], []);
+  assert.deepEqual([...next.done], [1]);
+});
+
+test("reduce: toggle-step marks a step done and back", () => {
+  const once = reduce(view(), { type: "toggle-step", index: 0 });
+  assert.deepEqual([...once.done], [0]);
+  assert.deepEqual([...reduce(once, { type: "toggle-step", index: 0 }).done], []);
+});
+
+test("reduce: servings-down at 1 stays 1; servings-up adds one", () => {
+  assert.equal(reduce(view({ servings: 1 }), { type: "servings-down" }).servings, 1);
+  assert.equal(reduce(view({ servings: 3 }), { type: "servings-down" }).servings, 2);
+  assert.equal(reduce(view({ servings: 3 }), { type: "servings-up" }).servings, 4);
+});
+
+test("reduce: go-to-steps switches to the steps tab; tab picks either", () => {
+  assert.equal(reduce(view(), { type: "go-to-steps" }).tab, "steps");
+  assert.equal(reduce(view({ tab: "steps" }), { type: "tab", tab: "ingredients" }).tab, "ingredients");
+});
+
+test("reduce does not mutate the view it is given", () => {
+  const before = view({ gathered: new Set([1]) });
+  reduce(before, { type: "toggle-ingredient", index: 1 });
+  assert.deepEqual([...before.gathered], [1]);
 });
