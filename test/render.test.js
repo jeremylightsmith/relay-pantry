@@ -4,8 +4,12 @@ import {
   countLabel,
   renderCard,
   renderGrid,
+  renderEmpty,
+  renderError,
   renderHeader,
+  renderNoResults,
   renderSortMenu,
+  viewState,
 } from "../public/render.js";
 
 const tacos = {
@@ -76,4 +80,39 @@ test("countLabel gives the total, or shown of total while searching", () => {
   assert.equal(countLabel(24, 24), "24 recipes");
   assert.equal(countLabel(3, 24), "3 of 24");
   assert.equal(countLabel(1, 1), "1 recipe");
+});
+
+test("viewState picks loading, error, empty, no-results or list", () => {
+  assert.equal(viewState({ loading: true, error: null, total: 0, shown: 0 }), "loading");
+  assert.equal(viewState({ loading: false, error: new Error("x"), total: 0, shown: 0 }), "error");
+  assert.equal(viewState({ loading: false, error: null, total: 0, shown: 0 }), "empty");
+  assert.equal(viewState({ loading: false, error: null, total: 5, shown: 0 }), "no-results");
+  assert.equal(viewState({ loading: false, error: null, total: 5, shown: 2 }), "list");
+});
+
+test("renderNoResults names the query and offers Clear search", () => {
+  const html = renderNoResults("lasagne");
+  assert.ok(html.includes("No recipes called “lasagne”"));
+  assert.match(html, /<button[^>]*>\s*Clear search\s*<\/button>/);
+});
+
+test("renderNoResults escapes the query", () => {
+  const html = renderNoResults('<img src=x onerror="alert(1)">');
+  assert.ok(!html.includes("<img"));
+  assert.ok(html.includes("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;"));
+});
+
+test("renderEmpty has exactly one primary button: Add your first recipe", () => {
+  const html = renderEmpty();
+  const primaries = html.match(/<(a|button)[^>]*class="btn primary[^"]*"[^>]*>[\s\S]*?<\/\1>/g) ?? [];
+  assert.equal(primaries.length, 1);
+  assert.ok(primaries[0].includes("Add your first recipe"));
+  assert.ok(html.includes("Your kitchen's cookbook starts here") || html.includes("Your kitchen&#39;s cookbook starts here"));
+});
+
+test("renderError shows an icon and a Try again button", () => {
+  const html = renderError();
+  assert.ok(html.includes("Couldn"));
+  assert.match(html, /class="state-icon[^"]*"/);
+  assert.match(html, /<button[^>]*>\s*Try again\s*<\/button>/);
 });

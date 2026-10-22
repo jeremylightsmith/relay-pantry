@@ -1,12 +1,23 @@
 // Recipe list page: fetches the household's recipes and renders the grid,
-// with a title search and a sort menu.
+// with a title search and a sort menu, plus the loading, error, empty and
+// no-results states.
 
 import { filterByTitle, sortRecipes } from "./recipes.js";
-import { countLabel, renderGrid, renderHeader, renderSortMenu } from "./render.js";
+import {
+  countLabel,
+  renderEmpty,
+  renderError,
+  renderGrid,
+  renderHeader,
+  renderLoading,
+  renderNoResults,
+  renderSortMenu,
+  viewState,
+} from "./render.js";
 
 const app = document.getElementById("app");
 
-const state = { recipes: [], query: "", sort: "recent" };
+const state = { household: null, recipes: [], query: "", sort: "recent", loading: true, error: null };
 
 function renderShell(household) {
   app.innerHTML = `${renderHeader(household)}
@@ -34,10 +45,38 @@ function renderShell(household) {
   bindSortMenu();
 }
 
+// Before the first successful load there is no household to head the page,
+// so loading and error show in a bare results area.
+function renderBareShell() {
+  app.innerHTML = `<section class="list"><div class="results"></div></section>`;
+}
+
 function renderResults() {
   const shown = sortRecipes(filterByTitle(state.recipes, state.query), state.sort);
-  app.querySelector(".count").textContent = countLabel(shown.length, state.recipes.length);
-  app.querySelector(".results").innerHTML = renderGrid(shown);
+  const total = state.recipes.length;
+  const view = viewState({ loading: state.loading, error: state.error, total, shown: shown.length });
+  app.dataset.view = view;
+
+  const count = app.querySelector(".count");
+  if (count) count.textContent = view === "list" || view === "no-results" ? countLabel(shown.length, total) : "";
+
+  const results = app.querySelector(".results");
+  if (view === "loading") results.innerHTML = renderLoading();
+  else if (view === "error") results.innerHTML = renderError();
+  else if (view === "empty") results.innerHTML = renderEmpty();
+  else if (view === "no-results") results.innerHTML = renderNoResults(state.query.trim());
+  else results.innerHTML = renderGrid(shown);
+
+  results.querySelector(".retry")?.addEventListener("click", load);
+  results.querySelector(".clear-search")?.addEventListener("click", clearSearch);
+}
+
+function clearSearch() {
+  const input = app.querySelector(".search input");
+  input.value = "";
+  state.query = "";
+  renderResults();
+  input.focus();
 }
 
 // Sort menu: opens from the pill, closes on choose, outside click or Escape.
@@ -117,11 +156,21 @@ function bindSortMenu() {
 }
 
 async function load() {
-  const res = await fetch("/api/recipes");
-  if (!res.ok) throw new Error(`GET /api/recipes: ${res.status}`);
-  const { household, recipes } = await res.json();
-  state.recipes = recipes;
-  renderShell(household);
+  state.loading = true;
+  state.error = null;
+  if (!state.household) renderBareShell();
+  renderResults();
+  try {
+    const res = await fetch("/api/recipes");
+    if (!res.ok) throw new Error(`GET /api/recipes: ${res.status}`);
+    const { household, recipes } = await res.json();
+    state.recipes = recipes;
+    if (!state.household) renderShell(household);
+    state.household = household;
+  } catch (error) {
+    state.error = error;
+  }
+  state.loading = false;
   renderResults();
 }
 

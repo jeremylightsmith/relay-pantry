@@ -81,3 +81,56 @@ export function renderSortMenu(current) {
   </div>
 </div>`;
 }
+
+// View states: which of the five screens the results area shows.
+
+export function viewState({ loading, error, total, shown }) {
+  if (loading) return "loading";
+  if (error) return "error";
+  if (total === 0) return "empty";
+  if (shown === 0) return "no-results";
+  return "list";
+}
+
+export function renderSkeletons(count = 8) {
+  const card = `<li><div class="card skeleton" aria-hidden="true">
+  <div class="photo"></div>
+  <div class="card-body"><span class="skeleton-line"></span><span class="skeleton-line short"></span></div>
+</div></li>`;
+  return `<ul class="grid skeletons" role="list" aria-hidden="true">\n${Array(count).fill(card).join("\n")}\n</ul>`;
+}
+
+export function renderLoading() {
+  return `<p class="visually-hidden" role="status">Loading recipes…</p>\n${renderSkeletons()}`;
+}
+
+export function renderError() {
+  return `<div class="state-overlay">
+  <div class="state error" role="alert">
+    <span class="state-icon error-icon" aria-hidden="true">!</span>
+    <h3>Couldn't load recipes</h3>
+    <p class="meta-text">Check your connection. Your recipes are safe.</p>
+    <button type="button" class="btn retry">Try again</button>
+  </div>
+  ${renderSkeletons()}
+</div>`;
+}
+
+export function renderEmpty() {
+  return `<div class="state empty">
+  <span class="state-icon empty-icon" aria-hidden="true">🍳</span>
+  <h3>Your kitchen's cookbook starts here</h3>
+  <p class="meta-text">Add the recipes your household cooks, and everyone can find them here.</p>
+  <a class="btn primary" href="/recipes/new">Add your first recipe</a>
+  <p class="meta-text coming-soon">Import from URL is coming soon.</p>
+</div>`;
+}
+
+export function renderNoResults(query) {
+  return `<div class="state no-results">
+  <span class="state-icon" aria-hidden="true">⌕</span>
+  <h3>No recipes called “${escapeHtml(query)}”</h3>
+  <p class="meta-text">Search looks at recipe titles. Searching by ingredient is coming soon.</p>
+  <button type="button" class="btn clear-search">Clear search</button>
+</div>`;
+}
