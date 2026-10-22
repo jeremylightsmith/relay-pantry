@@ -42,12 +42,19 @@ function renderHead(recipe) {
   </header>`;
 }
 
-function renderTabs(tab) {
-  const button = (value, label) =>
-    `<button type="button" class="tab" role="tab" aria-selected="${tab === value}" aria-controls="panel-${value}" data-tab="${value}">${label}</button>`;
+// Progress reads "2/11" after the label; an empty section shows none rather than "0/0".
+function renderTabs(recipe, view, tab) {
+  const progress = (count, total) =>
+    total ? `<span class="tab-progress"> ${count}/${total}</span>` : "";
+  const button = (value, label, count, total) =>
+    `<button type="button" class="tab" role="tab" aria-selected="${tab === value}" aria-controls="panel-${value}" data-tab="${value}">${label}${progress(count, total)}</button>`;
+  const ingredients = recipe.ingredients?.length ?? 0;
+  const steps = recipe.steps?.length ?? 0;
+  const gathered = [...(view.gathered ?? [])].filter((i) => i < ingredients);
+  const done = [...(view.done ?? [])].filter((i) => i < steps);
   return `<div class="tabs" role="tablist" aria-label="Recipe sections">
-    ${button("ingredients", "Ingredients")}
-    ${button("steps", "Steps")}
+    ${button("ingredients", "Ingredients", gathered.length, ingredients)}
+    ${button("steps", "Steps", done.length, steps)}
   </div>`;
 }
 
@@ -134,7 +141,7 @@ export function renderRecipePage(recipe, view = {}) {
   return `<article class="recipe" data-tab="${tab}">
   ${renderTop(recipe)}
   ${renderHead(recipe)}
-  ${renderTabs(tab)}
+  ${renderTabs(recipe, view, tab)}
   <div class="recipe-body">
   ${renderIngredients(recipe, view)}
   ${renderSteps(recipe, view)}

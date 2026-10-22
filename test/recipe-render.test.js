@@ -121,3 +121,30 @@ test("loading announces itself and error offers Try again", () => {
   assert.match(error, /role="alert"/);
   assert.match(error, /<button [^>]*class="btn retry"[^>]*>Try again<\/button>/);
 });
+
+const tabText = (html, value) =>
+  html.match(new RegExp(`<button [^>]*data-tab="${value}"[^>]*>([\\s\\S]*?)</button>`))[1].replace(/<[^>]+>/g, "");
+
+test("phone tabs show how many ingredients are gathered and steps done", () => {
+  const eleven = Array.from({ length: 11 }, (_, i) => ({ amount: 1, unit: null, item: `item ${i}`, note: null }));
+  const five = ["One.", "Two.", "Three.", "Four.", "Five."];
+  const html = renderRecipePage(
+    { ...tacos, ingredients: eleven, steps: five },
+    view({ gathered: new Set([0, 4]), done: new Set([0]) }),
+  );
+  assert.equal(tabText(html, "ingredients"), "Ingredients 2/11");
+  assert.equal(tabText(html, "steps"), "Steps 1/5");
+});
+
+test("phone tabs show zero progress when nothing is ticked", () => {
+  const html = renderRecipePage(tacos, view());
+  assert.equal(tabText(html, "ingredients"), "Ingredients 0/4");
+  assert.equal(tabText(html, "steps"), "Steps 0/3");
+});
+
+test("phone tabs show no progress for an empty section", () => {
+  const html = renderRecipePage({ ...tacos, ingredients: [], steps: [] }, view());
+  assert.equal(tabText(html, "ingredients"), "Ingredients");
+  assert.equal(tabText(html, "steps"), "Steps");
+  assert.ok(!html.includes("0/0"));
+});
